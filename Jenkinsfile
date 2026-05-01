@@ -7,13 +7,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Code') {
-            steps {
-                echo 'Cloning from GitHub...'
-                git 'https://github.com/Dev2139/Devops_Practical.git'
-            }
-        }
-
         stage('Build') {
             steps {
                 echo 'Building project using Maven...'
