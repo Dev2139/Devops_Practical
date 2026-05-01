@@ -1,0 +1,301 @@
+# Spring Boot CRUD Application with CI/CD
+
+A production-ready Spring Boot application demonstrating full CRUD operations with Jenkins CI/CD pipeline integration and Docker containerization.
+
+## Table of Contents
+- [Features](#features)
+- [Technologies](#technologies)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [API Endpoints](#api-endpoints)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Docker Deployment](#docker-deployment)
+- [Testing](#testing)
+- [Jenkins Configuration](#jenkins-configuration)
+- [Environment Variables](#environment-variables)
+
+## Features
+
+- **Full CRUD Operations**: Create, Read, Update, Delete products
+- **REST API**: RESTful endpoints with proper HTTP status codes
+- **Data Validation**: Input validation using Bean Validation
+- **Exception Handling**: Global exception handler with standardized error responses
+- **H2 Database**: In-memory database for development (MySQL support for production)
+- **Lombok**: Reduced boilerplate code
+- **Unit Testing**: Comprehensive JUnit and Mockito tests
+- **CI/CD Pipeline**: Jenkins pipeline for automated build, test, and deployment
+- **Docker Support**: Multi-stage Docker build for optimized images
+- **Docker Compose**: Full stack deployment with MySQL
+
+## Technologies
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Spring Boot | 3.2.5 | Application Framework |
+| Java | 17 | Programming Language |
+| Maven | 3.9 | Build Tool |
+| H2 Database | 2.x | Development Database |
+| MySQL | 8.0 | Production Database |
+| JUnit 5 | 5.x | Testing Framework |
+| Mockito | 5.x | Mocking Framework |
+| Lombok | 1.18.x | Boilerplate Reduction |
+| Docker | Latest | Containerization |
+| Jenkins | LTS | CI/CD Pipeline |
+
+## Project Structure
+
+```
+crud-app/
+├── pom.xml                          # Maven build configuration
+├── Jenkinsfile                      # Jenkins pipeline definition
+├── Dockerfile                       # Docker image build instructions
+├── docker-compose.yml               # Docker Compose configuration
+├── README.md                        # Project documentation
+└── src/
+    ├── main/
+    │   ├── java/com/example/crudapp/
+    │   │   ├── CrudAppApplication.java          # Main application class
+    │   │   ├── controller/
+    │   │   │   └── ProductController.java       # REST API controller
+    │   │   ├── service/
+    │   │   │   └── ProductService.java          # Business logic layer
+    │   │   ├── repository/
+    │   │   │   └── ProductRepository.java       # Data access layer
+    │   │   ├── entity/
+    │   │   │   └── Product.java                 # JPA entity
+    │   │   └── exception/
+    │   │       ├── ResourceNotFoundException.java   # Custom exception
+    │   │       └── GlobalExceptionHandler.java    # Exception handler
+    │   └── resources/
+    │       └── application.properties           # Application configuration
+    └── test/
+        └── java/com/example/crudapp/
+            ├── CrudAppApplicationTests.java
+            ├── controller/ProductControllerTest.java
+            └── service/ProductServiceTest.java
+```
+
+## Getting Started
+
+### Prerequisites
+
+- JDK 17 or higher
+- Maven 3.9 or higher
+- Docker (optional)
+- Jenkins (for CI/CD)
+
+### Local Development
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/crud-app.git
+cd crud-app
+```
+
+2. Build the project:
+```bash
+mvn clean compile
+```
+
+3. Run the application:
+```bash
+mvn spring-boot:run
+```
+
+4. Access the application:
+- Application: http://localhost:8080
+- H2 Console: http://localhost:8080/h2-console
+
+### Build for Production
+
+```bash
+mvn clean package
+```
+
+The JAR file will be created in `target/crud-app-1.0.0.jar`.
+
+## API Endpoints
+
+### Base URL
+```
+http://localhost:8080/api/products
+```
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products` | Get all products |
+| GET | `/api/products/{id}` | Get product by ID |
+| POST | `/api/products` | Create new product |
+| PUT | `/api/products/{id}` | Update product |
+| DELETE | `/api/products/{id}` | Delete product |
+| GET | `/api/products/search?name={name}` | Search products |
+| GET | `/api/products/stats/inventory-value` | Get total inventory value |
+| GET | `/api/products/health` | Health check |
+
+### Example Requests
+
+#### Create Product
+```bash
+curl -X POST http://localhost:8080/api/products \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Laptop",
+    "description": "Gaming Laptop",
+    "price": 999.99,
+    "quantity": 10
+  }'
+```
+
+#### Get All Products
+```bash
+curl http://localhost:8080/api/products
+```
+
+#### Update Product
+```bash
+curl -X PUT http://localhost:8080/api/products/1 \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Updated Laptop",
+    "description": "Updated Description",
+    "price": 1099.99,
+    "quantity": 15
+  }'
+```
+
+#### Delete Product
+```bash
+curl -X DELETE http://localhost:8080/api/products/1
+```
+
+## CI/CD Pipeline
+
+The Jenkins pipeline (`Jenkinsfile`) includes the following stages:
+
+1. **Checkout**: Clone source code from repository
+2. **Build**: Compile the project
+3. **Test**: Run unit tests and generate reports
+4. **Package**: Create JAR artifact
+5. **Code Quality**: Run code analysis
+6. **Docker Build**: Build Docker image (main branch only)
+7. **Push**: Push Docker image to registry (main branch only)
+8. **Archive**: Store build artifacts
+9. **Deploy**: Deploy to environment
+
+## Docker Deployment
+
+### Build Docker Image
+
+```bash
+docker build -t crud-app:latest .
+```
+
+### Run Docker Container
+
+```bash
+docker run -p 8080:8080 crud-app:latest
+```
+
+### Docker Compose (Full Stack)
+
+Deploy the application with MySQL database:
+
+```bash
+docker-compose up -d
+```
+
+This will start:
+- Application on port 8080
+- MySQL on port 3306
+- Jenkins on port 8081
+
+```bash
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+```
+
+## Testing
+
+### Run Unit Tests
+
+```bash
+mvn test
+```
+
+### Run Integration Tests
+
+```bash
+mvn verify
+```
+
+### Test Coverage
+
+```bash
+mvn clean test jacoco:report
+```
+
+Coverage report: `target/site/jacoco/index.html`
+
+## Jenkins Configuration
+
+### Required Jenkins Setup
+
+1. **Install Plugins**:
+   - Pipeline
+   - Git
+   - JUnit
+   - JaCoCo
+   - Docker Pipeline
+
+2. **Configure Tools** (Manage Jenkins -> Global Tool Configuration):
+   - Maven: Name `Maven-3.9`, Version 3.9.x
+   - JDK: Name `JDK-17`, Version 17
+
+3. **Configure Credentials** (Manage Jenkins -> Credentials):
+   - Docker Hub credentials with ID `docker-hub-credentials`
+
+4. **Create Pipeline Job**:
+   - Job name: `crud-app-pipeline`
+   - Pipeline script from SCM
+   - SCM: Git
+   - Repository URL: Your GitHub repository URL
+   - Branch: `*/main`
+   - Script Path: `Jenkinsfile`
+
+### GitHub Webhook Integration
+
+1. Go to GitHub repository -> Settings -> Webhooks
+2. Add webhook:
+   - Payload URL: `http://your-jenkins-server/github-webhook/`
+   - Content type: `application/json`
+   - Events: Just the push event
+   - Active: ✓
+
+## Environment Variables
+
+### Application Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SERVER_PORT` | 8080 | Application port |
+| `SPRING_PROFILES_ACTIVE` | - | Active Spring profile |
+| `SPRING_DATASOURCE_URL` | jdbc:h2:mem:cruddb | Database URL |
+| `SPRING_DATASOURCE_USERNAME` | sa | Database username |
+| `SPRING_DATASOURCE_PASSWORD` | - | Database password |
+| `SPRING_JPA_HIBERNATE_DDL_AUTO` | create-drop | Hibernate DDL mode |
+
+### Docker Environment
+
+| Variable | Description |
+|----------|-------------|
+| `JAVA_OPTS` | JVM options (default: `-Xmx512m -Xms256m`) |
+| `SPRING_PROFILES_ACTIVE` | Active Spring profile |
+
+---
+
+**Built with Spring Boot & DevOps**
